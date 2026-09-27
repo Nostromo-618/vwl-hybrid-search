@@ -26,7 +26,7 @@ const CDN = {
 
 export const VDL_HYBRID_SEARCH_VERSION = '0.2.0';
 
-export const DEFAULT_DOCS_BASE_URL = 'https://vanduo-oss.github.io/vd3-docs';
+export const DEFAULT_DOCS_BASE_URL = 'https://vd3.vanduo.dev';
 
 export type SearchDocument = {
   id: string;
@@ -38,7 +38,7 @@ export type SearchDocument = {
   keywords?: string[];
   headings?: string[];
   classes?: string[];
-  chunks?: Array<{ text?: string }>;
+  chunks?: Array<{ text?: string; heading?: string; anchor?: string; code?: string[] }>;
   bodyText?: string;
   [key: string]: unknown;
 };
@@ -134,10 +134,17 @@ type VectorPayload = {
   source?: string;
   generatedAt?: string;
   dimensions?: number;
+  schemaVersion?: number;
+  corpusHash?: string;
+  dtype?: string;
+  pooling?: string;
+  queryPrefix?: string;
+  documentPrefix?: string;
   documents: VectorRow[];
 };
 
 export function cosineSimilarity(a: number[], b: number[]): number {
+  if (a.length !== b.length || !a.length) return Number.NaN;
   let dot = 0;
   for (let i = 0; i < a.length; i++) {
     dot += a[i] * b[i];
@@ -213,13 +220,17 @@ type FuseModule = {
   default?: new (docs: SearchDocument[], opts: Record<string, unknown>) => FuseLike;
 } & (new (docs: SearchDocument[], opts: Record<string, unknown>) => FuseLike);
 
-type Extractor = (
+type Extractor = ((
   query: string,
   opts: { pooling: string; normalize: boolean },
-) => Promise<{ data: ArrayLike<number> }> | { data: ArrayLike<number> };
+) => Promise<{ data: ArrayLike<number> }> | { data: ArrayLike<number> }) & {
+  dispose?: () => Promise<void>;
+};
 
 export class HybridSearch {
   static VERSION = VDL_HYBRID_SEARCH_VERSION;
+  private _corpusHash?: string;
+  private _disposed = false;
 
   indexUrl: string;
   vectorsUrl: string;
@@ -280,7 +291,11 @@ export class HybridSearch {
     if (options.confidence === false) {
       this._confidence = false;
     } else {
-      this._confidence = { ...DEFAULT_CONFIDENCE, ...options.confidence };
+      this._confidence = {
+        ...DEFAULT_CONFIDENCE,
+        ...(presetId === 'minilm' ? { minTopScore: 0.42 } : {}),
+        ...options.confidence,
+      };
     }
 
     this._loadFuse = typeof options.loadFuse === 'function' ? options.loadFuse : loadFuseDefault;
@@ -321,13 +336,17 @@ export class HybridSearch {
       this._fusePromise = (async () => {
         const response = await fetch(this.indexUrl);
         if (!response.ok) throw new Error(`Failed to load search index: ${response.status}`);
-        const data = (await response.json()) as { documents: SearchDocument[] };
+        const data = (await response.json()) as {
+          documents: SearchDocument[];
+          corpusHash?: string;
+        };
         const payloadCheck = validateSearchIndexPayload(data, {
           maxDocuments: this.maxDocuments,
         });
         if (!payloadCheck.allowed) {
           throw new Error(payloadCheck.message || 'Search index payload validation failed.');
         }
+        this._corpusHash = data.corpusHash;
         this._docs = data.documents;
         this._docMap = new Map(this._docs.map((d) => [d.id, d]));
 
@@ -369,6 +388,7 @@ export class HybridSearch {
   }
 
   async initSemantic(): Promise<void> {
+    if (this._disposed) throw new Error('Search was disposed.');
     await this.initFuzzy();
     if (this._semanticReady) return;
     if (this._semanticFailed) {
@@ -384,43 +404,10 @@ export class HybridSearch {
 
         let vectorsData: VectorPayload;
         try {
-          const transformers = (await this._loadTransformers()) as {
-            env?: { backends?: { onnx?: { wasm?: { wasmPaths?: string } } } };
-            pipeline: (
-              task: string,
-              model: string,
-              opts?: Record<string, unknown>,
-            ) => Promise<Extractor> | Extractor;
-          };
-          this._applyOnnxWasmPaths(transformers);
-
-          const extractorPromise = transformers.pipeline('feature-extraction', this.modelName, {
-            dtype: this.dtype,
-            progress_callback: (progress: { status?: string; loaded?: number; total?: number }) => {
-              if (progress?.status === 'progress' && progress.total) {
-                this._emitSemanticProgress({
-                  stage: 'downloading',
-                  message: `Downloading model… ${Math.round(((progress.loaded || 0) / progress.total) * 100)}%`,
-                  progress,
-                });
-              }
-            },
-          });
-
           vectorsData = await fetch(this.vectorsUrl).then(async (r) => {
             if (!r.ok) throw new Error(`Failed to load vectors: ${r.status}`);
             return r.json() as Promise<VectorPayload>;
           });
-
-          if (
-            typeof vectorsData.model === 'string' &&
-            vectorsData.model.trim() &&
-            vectorsData.model.trim() !== this.modelName
-          ) {
-            console.warn(
-              `[HybridSearch] vectors.json model "${vectorsData.model}" differs from active modelName "${this.modelName}". Re-index with the same model for accurate semantic search.`,
-            );
-          }
 
           const vectorsCheck = validateVectorPayload(vectorsData, {
             maxDocuments: this.maxDocuments,
@@ -436,7 +423,71 @@ export class HybridSearch {
             throw new Error(`Vector payload references unknown doc id: ${unknownVectorId.id}`);
           }
 
-          this._extractor = await extractorPromise;
+          if (
+            vectorsData.documents.length !== knownDocIds.size ||
+            new Set(vectorsData.documents.map((r) => r.id)).size !== knownDocIds.size
+          )
+            throw new Error(
+              'Vector set is incomplete or contains duplicate IDs. Fuzzy search remains available.',
+            );
+          const dimensions = vectorsData.documents[0].embedding.length;
+          const preset = resolvePresetConfig(this.embeddingPreset);
+          if (
+            (vectorsData.model && vectorsData.model !== this.modelName) ||
+            (vectorsData.dimensions && vectorsData.dimensions !== dimensions) ||
+            (preset && preset.modelName === this.modelName && dimensions !== preset.dimensions)
+          )
+            throw new Error(
+              'Embedding model or dimensions do not match the vectors. Fuzzy search remains available.',
+            );
+          if (this._corpusHash || vectorsData.schemaVersion) {
+            const documentPrefix =
+              this.embeddingPreset === 'embeddinggemma'
+                ? 'title: {title} | text: '
+                : this.embeddingPreset === 'e5'
+                  ? 'passage: '
+                  : '';
+            if (
+              !this._corpusHash ||
+              vectorsData.corpusHash !== this._corpusHash ||
+              vectorsData.model !== this.modelName ||
+              vectorsData.dtype !== this.dtype ||
+              vectorsData.pooling !== 'mean' ||
+              vectorsData.queryPrefix !== this.queryPrefix ||
+              vectorsData.documentPrefix !== documentPrefix
+            )
+              throw new Error(
+                'Search corpus and embedding configuration do not match. Fuzzy search remains available.',
+              );
+          }
+          const transformers = (await this._loadTransformers()) as {
+            env?: { backends?: { onnx?: { wasm?: { wasmPaths?: string } } } };
+            pipeline: (
+              task: string,
+              model: string,
+              opts?: Record<string, unknown>,
+            ) => Promise<Extractor> | Extractor;
+          };
+          this._applyOnnxWasmPaths(transformers);
+
+          this._extractor = await transformers.pipeline('feature-extraction', this.modelName, {
+            dtype: this.dtype,
+            progress_callback: (progress: { status?: string; loaded?: number; total?: number }) => {
+              if (progress?.status === 'progress' && progress.total) {
+                this._emitSemanticProgress({
+                  stage: 'downloading',
+                  message: `Downloading model… ${Math.round(((progress.loaded || 0) / progress.total) * 100)}%`,
+                  progress,
+                });
+              }
+            },
+          });
+
+          if (this._disposed) {
+            await this._extractor?.dispose?.();
+            this._extractor = null;
+            throw new Error('Search was disposed.');
+          }
         } catch (err) {
           this._semanticFailed = true;
           this._semanticPromise = null;
@@ -473,11 +524,25 @@ export class HybridSearch {
       normalize: true,
     });
     const queryVec = Array.from(output.data);
+    if (
+      queryVec.length !== this._vectors[0].embedding.length ||
+      queryVec.some((v) => !Number.isFinite(v))
+    )
+      throw new Error('Query embedding dimensions or values are invalid.');
 
     return rankBySimilarity(queryVec, this._vectors, this.semanticThreshold).slice(
       0,
       this.maxSemanticResults,
     );
+  }
+
+  async dispose(): Promise<void> {
+    this._disposed = true;
+    this._progressSubscribers = [];
+    if (this._semanticPromise) await this._semanticPromise.catch(() => {});
+    await this._extractor?.dispose?.();
+    this._extractor = null;
+    this._semanticReady = false;
   }
 
   /**

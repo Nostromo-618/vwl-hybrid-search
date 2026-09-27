@@ -71,6 +71,7 @@ function createSearch(overrides: ConstructorParameters<typeof HybridSearch>[0] =
       throw new Error('semantic unavailable');
     },
     confidence: false,
+    embeddingPreset: 'none',
     ...overrides,
   });
 }
@@ -85,7 +86,7 @@ describe('smoke', () => {
   it('version matches package.json', () => {
     expect(VDL_HYBRID_SEARCH_VERSION).toBe(pkg.version);
     expect(HybridSearch.VERSION).toBe(pkg.version);
-    expect(DEFAULT_DOCS_BASE_URL).toContain('vd3-docs');
+    expect(DEFAULT_DOCS_BASE_URL).toContain('vd3.vanduo.dev');
     expect(VD_GUARDRAILS_VERSION).toBeTruthy();
   });
 });
@@ -362,8 +363,8 @@ describe('search guardrails', () => {
     expect(safeDocHref('https://docs.example', 'legacy/route')).toBe(
       'https://docs.example/#legacy/route',
     );
-    expect(safeDocHref('ftp://bad', '/ok')).toContain('vd3-docs');
-    expect(safeDocHref('not a url', '/ok')).toContain('vd3-docs');
+    expect(safeDocHref('ftp://bad', '/ok')).toContain('vd3.vanduo.dev');
+    expect(safeDocHref('not a url', '/ok')).toContain('vd3.vanduo.dev');
     expect(safeDocHref('https://docs.example', '')).toBe('#');
     expect(safeDocHref('https://docs.example', '../escape')).toBe('#');
     expect(safeDocHref('https://docs.example', 'bad:route')).toBe('#');
@@ -770,24 +771,13 @@ describe('HybridSearch', () => {
     await expect(semantic.initSemantic()).rejects.toThrow();
   });
 
-  it('warns when vectors.json model differs from modelName', async () => {
-    stubFetch(fixture, {
-      model: 'Xenova/all-MiniLM-L6-v2',
-      documents: makeVectors().documents,
-    });
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const search = createSearch({
-      embeddingPreset: 'embeddinggemma',
-      loadTransformers: async () => ({
-        pipeline: async (_t: string, _m: string, opts?: Record<string, unknown>) => {
-          expect(opts?.dtype).toBe('q8');
-          expect(opts?.quantized).toBeUndefined();
-          return async () => ({ data: [1, 0, 0, 0] });
-        },
-      }),
-    });
-    await search.initSemantic();
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('differs from active modelName'));
+  it('rejects incompatible vectors before importing or downloading the runtime', async () => {
+    stubFetch(fixture, { ...makeVectors(), model: 'different/model' });
+    const loader = vi.fn();
+    const search = createSearch({ loadTransformers: loader });
+    await expect(search.initSemantic()).rejects.toThrow(/do not match/);
+    expect(loader).not.toHaveBeenCalled();
+    expect((await search.search('truthiness', { mode: 'fuzzy' })).merged.length).toBeGreaterThan(0);
   });
 
   it('applies query prefix in semanticSearch', async () => {
@@ -857,5 +847,90 @@ describe('HybridSearch', () => {
       'zzzz',
     );
     expect(unfiltered.length).toBeGreaterThan(0);
+  });
+});
+
+describe('coherent assets and lifecycle', () => {
+  const corpus = { ...fixture, corpusHash: 'same-corpus' };
+  const payload = () => ({
+    ...makeVectors(mockDocs, 384),
+    schemaVersion: 1,
+    model: 'Xenova/all-MiniLM-L6-v2',
+    dimensions: 384,
+    dtype: 'q8',
+    pooling: 'mean',
+    queryPrefix: '',
+    documentPrefix: '',
+    corpusHash: 'same-corpus',
+  });
+  it.each([
+    { dimensions: 768 },
+    { model: 'wrong' },
+    { corpusHash: 'old-corpus' },
+    { dtype: 'fp32' },
+    { pooling: 'cls' },
+    { queryPrefix: 'wrong' },
+    { documentPrefix: 'wrong' },
+  ])('rejects metadata mismatch %# before downloading', async (patch) => {
+    stubFetch(corpus, { ...payload(), ...patch });
+    const loader = vi.fn();
+    const search = createSearch({ embeddingPreset: 'minilm', loadTransformers: loader });
+    await expect(search.initSemantic()).rejects.toThrow(/do not match/);
+    expect(loader).not.toHaveBeenCalled();
+  });
+  it('rejects default Gemma loading legacy MiniLM vectors', async () => {
+    stubFetch(fixture, makeVectors(mockDocs, 384));
+    const loader = vi.fn();
+    const search = createSearch({ embeddingPreset: 'embeddinggemma', loadTransformers: loader });
+    await expect(search.initSemantic()).rejects.toThrow(/dimensions/);
+    expect(loader).not.toHaveBeenCalled();
+  });
+  it('rejects duplicate or incomplete rows', async () => {
+    for (const documents of [
+      makeVectors().documents.slice(1),
+      [makeVectors().documents[0], makeVectors().documents[0]],
+    ]) {
+      stubFetch(fixture, { documents });
+      await expect(createSearch().initSemantic()).rejects.toThrow(/incomplete/);
+    }
+  });
+  it('validates query dimensions and disposes the extractor', async () => {
+    stubFetch(corpus, payload());
+    const dispose = vi.fn();
+    const extractor = Object.assign(
+      vi.fn(async () => ({ data: new Float32Array(4) })),
+      { dispose },
+    );
+    const search = createSearch({
+      embeddingPreset: 'minilm',
+      loadTransformers: async () => ({ pipeline: () => extractor }),
+    });
+    await search.initSemantic();
+    await expect(search.semanticSearch('valid question')).rejects.toThrow(/Query embedding/);
+    await search.dispose();
+    expect(dispose).toHaveBeenCalledTimes(1);
+    await expect(search.initSemantic()).rejects.toThrow(/disposed/);
+    expect(cosineSimilarity([1], [1, 2])).toBeNaN();
+    expect(cosineSimilarity([], [])).toBeNaN();
+  });
+  it('releases a model whose load finishes after disposal', async () => {
+    stubFetch();
+    let done!: (value: unknown) => void;
+    const dispose = vi.fn();
+    const search = createSearch({
+      loadTransformers: async () => ({
+        pipeline: () =>
+          new Promise((resolve) => {
+            done = resolve;
+          }),
+      }),
+    });
+    const loading = search.initSemantic();
+    await vi.waitFor(() => expect(done).toBeDefined());
+    const closing = search.dispose();
+    done(Object.assign(async () => ({ data: [1, 0, 0, 0] }), { dispose }));
+    await expect(loading).rejects.toThrow(/disposed/);
+    await closing;
+    expect(dispose).toHaveBeenCalledTimes(1);
   });
 });

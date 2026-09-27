@@ -53,8 +53,8 @@ export function buildEmbedInput(doc, presetId) {
   if (preset.usesDocumentPrefix) {
     return prefixDocument(doc.title, raw, presetId).slice(0, 1600);
   }
-  return `${doc.title}. ${doc.category}. ${(doc.keywords || []).join('. ')}. ${(doc.headings || []).join('. ')}. ${doc.bodyText || ''}`.slice(
+  return `${doc.title}. ${doc.category}. ${(doc.bodyText || '').slice(0, 520)}. ${(doc.keywords || []).slice(0, 16).join('. ')}. ${(doc.headings || []).slice(0, 8).join('. ')}`.slice(
     0,
-    512,
+    1000,
   );
 }

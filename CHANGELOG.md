@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased — local Labs refresh
+
+- Validate corpus/vector identity before loading embeddings; keep fuzzy retrieval available on mismatch.
+- Add canonical local HTML/export indexing with atomic dual-preset manifests and provenance.
+- Preserve section anchors, API identifiers and bounded examples; use canonical vd3 links.
+- Dispose embedding pipelines safely and validate query vector dimensions.
+- Tune MiniLM confidence against the retained real-package benchmark.
+
+
 ## 0.2.0 — EmbeddingGemma presets, Transformers.js v4, confidence cutoff
 
 **Migration:** Re-index `vectors.json` when upgrading from 0.1.x. The default model is now

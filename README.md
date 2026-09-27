@@ -62,36 +62,22 @@ Choose a preset with `embeddingPreset` — it sets `modelName`, `dtype`, dimensi
 | `e5` | `Xenova/multilingual-e5-small` | 384 | `query:` / `passage:` | Multilingual |
 | `none` | — | — | — | Supply `modelName` + prefixes yourself |
 
-**Rule:** Vectors must be built with the **same model, pooling (`mean`), normalization, and prefixes** as runtime. Mismatch triggers a console warning.
+**Rule:** Vectors must match the model, dimensions, dtype, pooling, normalization, prefixes and corpus hash. Incompatible assets are rejected before importing the embedding runtime. Fuzzy search remains available. Labs explicitly selects MiniLM; EmbeddingGemma remains the package default for existing consumers.
 
 ## Building the index
 
-Use the bundled CLI after installing the package:
+Use the canonical search export and rendered HTML from the **same local vd3-docs build**. The source checkout is read only. Install this sibling package's development dependencies for the CLI (`linkedom` and Transformers.js); they are not runtime dependencies of the browser library.
 
 ```bash
-npx vdl-hybrid-index --site https://your-site.example --nav ./src/nav.ts --out ./public/search --preset embeddinggemma
+pnpm build
+node scripts/vdl-hybrid-index.mjs --source-root ../../vd3/vd3-docs --out ../labs/data --presets minilm,embeddinggemma
 ```
 
-Or a config file:
+`--input` overrides `dist/search/search-index.json`; `--html-dir` overrides `dist`. `--config` accepts `sourceRoot`, `input`, `htmlDir`, `outDir`, and `presets`. Downloaded navigation JavaScript is never executed; legacy `--nav` / `--site` options are rejected.
 
-```json
-{
-  "site": "http://127.0.0.1:8787",
-  "navPath": "../vd3-docs/src/nav.ts",
-  "outDir": "./public/search",
-  "preset": "embeddinggemma",
-  "fetchConcurrency": 6
-}
-```
+The manifest `search-manifest.json` points to an immutable `search/<generation>/` directory containing the corpus and both vector files. It records source revision/dirty state/content hash, corpus hash, model, dimensions, q8 dtype, mean pooling, normalization, prefixes, and asset hashes. Parsing or embedding failures leave the previous manifest intact. Hosts resolve the manifest and pass its URLs to the engine; see Labs' `src/lib/docs-search.js`.
 
-```bash
-vdl-hybrid-index --config indexer.config.json
-```
-
-Outputs:
-
-- `search-index.json` — `{ documents: SearchDocument[] }`
-- `vectors.json` — `{ model, preset, dimensions, generatedAt, documents: [{ id, embedding }] }`
+HTML enrichment keeps verified section anchors, API rows, identifiers and bounded code examples. Fuzzy search is immediately usable after `initFuzzy()`. Call `initSemantic()` only after an explicit download action, and `dispose()` when the owner unmounts.
 
 ## API
 

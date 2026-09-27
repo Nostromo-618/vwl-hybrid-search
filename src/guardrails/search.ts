@@ -7,7 +7,7 @@ const SAFE_ICON_RE = /^[a-z0-9-]{1,64}$/i;
 const SAFE_HASH_ROUTE_RE = /^[a-z0-9/_-]{1,240}$/i;
 /** Path routes for vd3-docs (`/` or `/components/button`). */
 const SAFE_PATH_ROUTE_RE = /^\/(?:[a-z0-9/_-]{0,239})$/i;
-const DEFAULT_DOCS_BASE = 'https://vanduo-oss.github.io/vd3-docs';
+const DEFAULT_DOCS_BASE = 'https://vd3.vanduo.dev';
 
 export type SearchIndexDocument = {
   id: string;
