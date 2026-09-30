@@ -3,7 +3,7 @@
 **VdlHybridSearch** — headless hybrid fuzzy + semantic search for documentation and curriculum corpora.
 
 This is a **Labs sibling repo**, not a public npm package. Consume it via `link:` /
-workspace next to [Vanduo Labs](https://github.com/vanduo-oss/labs).
+workspace next to [Vanduo Web Labs](https://github.com/vanduo-oss/labs).
 
 Fuzzy retrieval uses [Fuse.js](https://www.fusejs.io/). Semantic retrieval uses [Transformers.js](https://huggingface.co/docs/transformers.js) v4 with configurable **embedding presets** (default: **EmbeddingGemma**). The package has **zero runtime npm dependencies**; hosts inject Fuse/Transformers (bundled or CDN) and serve pre-built index/vector JSON.
 

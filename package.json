@@ -2,7 +2,7 @@
   "name": "@vanduo-oss/vdl-hybrid-search",
   "version": "0.2.0",
   "private": true,
-  "description": "Vanduo Labs headless hybrid fuzzy+semantic search (VdlHybridSearch)",
+  "description": "Vanduo Web Labs headless hybrid fuzzy+semantic search (VdlHybridSearch)",
   "type": "module",
   "homepage": "https://github.com/vanduo-oss/vdl-hybrid-search#readme",
   "repository": {
