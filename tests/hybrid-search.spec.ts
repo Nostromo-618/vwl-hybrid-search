@@ -7,7 +7,7 @@ import {
   HybridSearch,
   cosineSimilarity,
   rankBySimilarity,
-  VDL_HYBRID_SEARCH_VERSION,
+  VWL_HYBRID_SEARCH_VERSION,
   DEFAULT_DOCS_BASE_URL,
   EMBEDDING_PRESETS,
   prefixQuery,
@@ -84,7 +84,7 @@ afterEach(() => {
 
 describe('smoke', () => {
   it('version matches package.json', () => {
-    expect(VDL_HYBRID_SEARCH_VERSION).toBe(pkg.version);
+    expect(VWL_HYBRID_SEARCH_VERSION).toBe(pkg.version);
     expect(HybridSearch.VERSION).toBe(pkg.version);
     expect(DEFAULT_DOCS_BASE_URL).toContain('vd3.vanduo.dev');
     expect(VD_GUARDRAILS_VERSION).toBeTruthy();

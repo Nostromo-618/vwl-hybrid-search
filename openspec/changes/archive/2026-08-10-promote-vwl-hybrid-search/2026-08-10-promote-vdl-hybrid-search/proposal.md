@@ -1,6 +1,6 @@
 ## Why
 
-Promote labs Neptune hybrid search into `@vanduo-oss/vdl-hybrid-search` with a renamed headless `HybridSearch` API so ts-school can dogfood a dedicated package.
+Promote labs Neptune hybrid search into `@vanduo-oss/vwl-hybrid-search` with a renamed headless `HybridSearch` API so ts-school can dogfood a dedicated package.
 
 ## What Changes
 
@@ -14,8 +14,8 @@ Promote labs Neptune hybrid search into `@vanduo-oss/vdl-hybrid-search` with a r
 ### New Capabilities
 
 - `repo-scaffold`: package metadata, build, gates (no CI)
-- `vdl-hybrid-search`: headless HybridSearch engine
-- `vdl-guardrails-search`: query/index/vector validation helpers
+- `vwl-hybrid-search`: headless HybridSearch engine
+- `vwl-guardrails-search`: query/index/vector validation helpers
 
 ### Modified Capabilities
 

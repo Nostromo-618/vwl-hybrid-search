@@ -3,13 +3,13 @@
 ## Purpose
 
 Package scaffold, Labs-sibling metadata, and GitHub Actions CI for
-`@vanduo-oss/vdl-hybrid-search` (not a public npm package).
+`@vanduo-oss/vwl-hybrid-search` (not a public npm package).
 
 ## Requirements
 
 ### Requirement: package-metadata
 
-The package MUST declare `@vanduo-oss/vdl-hybrid-search` with dual ESM/CJS
+The package MUST declare `@vanduo-oss/vwl-hybrid-search` with dual ESM/CJS
 exports and typed entry points. It MUST be a Labs sibling repo
 (`"private": true`) and MUST NOT declare `publishConfig` for public npm.
 
@@ -23,7 +23,7 @@ exports and typed entry points. It MUST be a Labs sibling repo
 
 - **GIVEN** package version `0.2.0`
 - **WHEN** smoke tests run
-- **THEN** `VDL_HYBRID_SEARCH_VERSION` equals `0.2.0`
+- **THEN** `VWL_HYBRID_SEARCH_VERSION` equals `0.2.0`
 
 ### Requirement: github-actions-ci
 

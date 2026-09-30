@@ -1,4 +1,4 @@
-# vdl-guardrails-search Specification
+# vwl-guardrails-search Specification
 
 ## Purpose
 

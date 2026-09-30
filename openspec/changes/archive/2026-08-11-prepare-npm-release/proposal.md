@@ -1,10 +1,10 @@
 ## Why
 
-The package is extracted and dogfooded via `file:` but remains private, without CI, with Prettier drift, thin docs, and no dual local-vs-CI QA story. We need a first public npm release of `@vanduo-oss/vdl-hybrid-search@0.1.1`.
+The package is extracted and dogfooded via `file:` but remains private, without CI, with Prettier drift, thin docs, and no dual local-vs-CI QA story. We need a first public npm release of `@vanduo-oss/vwl-hybrid-search@0.1.1`.
 
 ## What Changes
 
-- Remove `"private": true` and prepare publish for `@vanduo-oss/vdl-hybrid-search@0.1.1`
+- Remove `"private": true` and prepare publish for `@vanduo-oss/vwl-hybrid-search@0.1.1`
 - Add GitHub Actions CI (format, lint, typecheck, coverage unit suite, build, pack dry-run, audit) — **no** heavy MiniLM download/inference requirement on CI
 - Add local Mac M4 QA gate: real Fuse.js + Transformers.js MiniLM against fixture corpus
 - Enforce Prettier/ESLint clean; Vitest coverage thresholds ≥90% on `src/` for CI suites

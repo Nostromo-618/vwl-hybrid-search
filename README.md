@@ -1,6 +1,6 @@
-# @vanduo-oss/vdl-hybrid-search
+# @vanduo-oss/vwl-hybrid-search
 
-**VdlHybridSearch** — headless hybrid fuzzy + semantic search for documentation and curriculum corpora.
+**VwlHybridSearch** — headless hybrid fuzzy + semantic search for documentation and curriculum corpora.
 
 This is a **Labs sibling repo**, not a public npm package. Consume it via `link:` /
 workspace next to [Vanduo Web Labs](https://github.com/vanduo-oss/labs).
@@ -12,8 +12,8 @@ Fuzzy retrieval uses [Fuse.js](https://www.fusejs.io/). Semantic retrieval uses 
 ## Install (sibling link)
 
 ```bash
-git clone https://github.com/vanduo-oss/vdl-hybrid-search.git
-cd vdl-hybrid-search && pnpm install && pnpm run build
+git clone https://github.com/vanduo-oss/vwl-hybrid-search.git
+cd vwl-hybrid-search && pnpm install && pnpm run build
 ```
 
 In the host `package.json`:
@@ -21,7 +21,7 @@ In the host `package.json`:
 ```json
 {
   "dependencies": {
-    "@vanduo-oss/vdl-hybrid-search": "link:../vdl-hybrid-search"
+    "@vanduo-oss/vwl-hybrid-search": "link:../vwl-hybrid-search"
   }
 }
 ```
@@ -35,7 +35,7 @@ pnpm add fuse.js @huggingface/transformers
 ## Quick start
 
 ```ts
-import { HybridSearch } from '@vanduo-oss/vdl-hybrid-search';
+import { HybridSearch } from '@vanduo-oss/vwl-hybrid-search';
 import Fuse from 'fuse.js';
 
 const search = new HybridSearch({
@@ -70,7 +70,7 @@ Use the canonical search export and rendered HTML from the **same local vd3-docs
 
 ```bash
 pnpm build
-node scripts/vdl-hybrid-index.mjs --source-root ../../vd3/vd3-docs --out ../labs/data --presets minilm,embeddinggemma
+node scripts/vwl-hybrid-index.mjs --source-root ../../vd3/vd3-docs --out ../labs/data --presets minilm,embeddinggemma
 ```
 
 `--input` overrides `dist/search/search-index.json`; `--html-dir` overrides `dist`. `--config` accepts `sourceRoot`, `input`, `htmlDir`, `outDir`, and `presets`. Downloaded navigation JavaScript is never executed; legacy `--nav` / `--site` options are rejected.

@@ -9,7 +9,7 @@ const options = {};
 for (let i = 0; i < args.length; i++) {
   if (args[i] === '--help') {
     console.log(
-      'vdl-hybrid-index --input <search-index.json> --html-dir <dist> --source-root <docs-repo> --out <data-dir> [--presets minilm,embeddinggemma] [--config config.json]',
+      'vwl-hybrid-index --input <search-index.json> --html-dir <dist> --source-root <docs-repo> --out <data-dir> [--presets minilm,embeddinggemma] [--config config.json]',
     );
     process.exit(0);
   }

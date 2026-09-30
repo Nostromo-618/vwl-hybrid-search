@@ -3,7 +3,7 @@
 ## Purpose
 
 Defines dual QA gates and release documentation for publishing
-`@vanduo-oss/vdl-hybrid-search` while keeping remote CI free of mandatory heavy
+`@vanduo-oss/vwl-hybrid-search` while keeping remote CI free of mandatory heavy
 semantic model downloads.
 
 ## Requirements

@@ -1,9 +1,9 @@
 schema: spec-driven
 
 context: |
-  Package: @vanduo-oss/vdl-hybrid-search (MIT, vanduo-oss org). Labs sibling
+  Package: @vanduo-oss/vwl-hybrid-search (MIT, vanduo-oss org). Labs sibling
   repo — private / not published on npm; consume via link: beside Labs.
-  VdlHybridSearch — headless hybrid fuzzy+semantic search (Fuse.js + Transformers.js).
+  VwlHybridSearch — headless hybrid fuzzy+semantic search (Fuse.js + Transformers.js).
   Renamed from labs NeptuneSearch. Zero runtime npm deps; Fuse/Transformers load via
   CDN or host injectors. Corpus-agnostic index schema via search guardrails.
   Stack: TypeScript ESM library, vite lib build, vitest. OpenSpec is SoT.

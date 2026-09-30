@@ -33,7 +33,7 @@ describe('canonical atomic indexer', () => {
     expect(() => enrichDocument(doc, '<div>missing</div>')).toThrow(/Missing/);
   });
   it('publishes only a complete matching set and preserves its manifest after failure', async () => {
-    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'vdl-index-test-'));
+    const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'vwl-index-test-'));
     dirs.push(dir);
     const input = path.join(dir, 'source.json');
     await fs.writeFile(input, JSON.stringify({ documents: [doc] }));

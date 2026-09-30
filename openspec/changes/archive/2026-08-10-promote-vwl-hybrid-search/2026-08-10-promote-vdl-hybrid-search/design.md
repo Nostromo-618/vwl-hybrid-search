@@ -1,6 +1,6 @@
 ## Context
 
-Labs shipped `NeptuneSearch` inside `@vanduo-oss/vdl-engines`. The new private repo is named `vdl-hybrid-search`; the public class is `HybridSearch` (product id VdlHybridSearch).
+Labs shipped `NeptuneSearch` inside `@vanduo-oss/vwl-engines`. The new private repo is named `vwl-hybrid-search`; the public class is `HybridSearch` (product id VwlHybridSearch).
 
 ## Goals / Non-Goals
 
@@ -10,7 +10,7 @@ Labs shipped `NeptuneSearch` inside `@vanduo-oss/vdl-engines`. The new private r
 
 ## Decisions
 
-1. Rename surface `NeptuneSearch` → `HybridSearch`; version const `VDL_HYBRID_SEARCH_VERSION`.
+1. Rename surface `NeptuneSearch` → `HybridSearch`; version const `VWL_HYBRID_SEARCH_VERSION`.
 2. Headless only — drop DOM `NeptuneSearchUI` from the package.
 3. Duplicate `guardrails/core` into this package.
 4. Ship indexer script + curriculum-shaped fixture; do not ship vd3-docs corpus as the product default.

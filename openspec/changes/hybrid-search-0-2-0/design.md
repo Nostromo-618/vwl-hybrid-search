@@ -16,7 +16,7 @@ internally. CDN URLs point at `@huggingface/transformers@4`.
 
 ## Indexer
 
-`scripts/vdl-hybrid-index.mjs` reads a JSON config or CLI flags, crawls HTML routes,
+`scripts/vwl-hybrid-index.mjs` reads a JSON config or CLI flags, crawls HTML routes,
 writes `search-index.json` + `vectors.json` with preset-aware prefixes and metadata.
 
 ## Migration

@@ -1,6 +1,6 @@
 - [ ] Add `src/embedding-presets.ts` and `src/confidence.ts`
 - [ ] Update `HybridSearch` with presets, dtype, prefixes, confidence, maxSemanticResults
-- [ ] Generalize indexer → `vdl-hybrid-index` bin
+- [ ] Generalize indexer → `vwl-hybrid-index` bin
 - [ ] Update unit + e2e tests
 - [ ] Rewrite README; CHANGELOG 0.2.0
 - [ ] `pnpm test:ci && pnpm build && npm pack --dry-run`

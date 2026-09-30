@@ -1,4 +1,4 @@
-# vdl-hybrid-search Specification
+# vwl-hybrid-search Specification
 
 ## Purpose
 

@@ -15,7 +15,7 @@ CSP hosts (`script-src 'self'`) cannot load Transformers.js ONNX Runtime WASM fr
 
 ### Modified Capabilities
 
-- `vdl-hybrid-search`: CSP-safe ORT WASM path injection
+- `vwl-hybrid-search`: CSP-safe ORT WASM path injection
 
 ## Impact
 

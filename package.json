@@ -1,16 +1,16 @@
 {
-  "name": "@vanduo-oss/vdl-hybrid-search",
+  "name": "@vanduo-oss/vwl-hybrid-search",
   "version": "0.2.0",
   "private": true,
-  "description": "Vanduo Web Labs headless hybrid fuzzy+semantic search (VdlHybridSearch)",
+  "description": "Vanduo Web Labs headless hybrid fuzzy+semantic search (VwlHybridSearch)",
   "type": "module",
-  "homepage": "https://github.com/vanduo-oss/vdl-hybrid-search#readme",
+  "homepage": "https://github.com/vanduo-oss/vwl-hybrid-search#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vanduo-oss/vdl-hybrid-search.git"
+    "url": "git+https://github.com/vanduo-oss/vwl-hybrid-search.git"
   },
   "bugs": {
-    "url": "https://github.com/vanduo-oss/vdl-hybrid-search/issues"
+    "url": "https://github.com/vanduo-oss/vwl-hybrid-search/issues"
   },
   "license": "MIT",
   "author": "vanduo-oss",
@@ -48,7 +48,7 @@
     "./package.json": "./package.json"
   },
   "bin": {
-    "vdl-hybrid-index": "./scripts/vdl-hybrid-index.mjs"
+    "vwl-hybrid-index": "./scripts/vwl-hybrid-index.mjs"
   },
   "scripts": {
     "build": "node scripts/clean-dist.mjs && vite build && tsc -p tsconfig.build.json",

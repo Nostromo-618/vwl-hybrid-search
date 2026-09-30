@@ -13,7 +13,7 @@
 
 **Migration:** Re-index `vectors.json` when upgrading from 0.1.x. The default model is now
 `onnx-community/embeddinggemma-300m-ONNX` (768 dims). Pass `embeddingPreset: 'minilm'` until
-vectors are rebuilt, or regenerate with `vdl-hybrid-index --preset embeddinggemma`.
+vectors are rebuilt, or regenerate with `vwl-hybrid-index --preset embeddinggemma`.
 
 ### Added
 
@@ -24,7 +24,7 @@ vectors are rebuilt, or regenerate with `vdl-hybrid-index --preset embeddinggemm
 - Adaptive confidence cutoff in `mergeResults` (default on; `confidence: false` to disable).
 - `maxSemanticResults` option (default 10) replacing hardcoded semantic slice.
 - Warning when `vectors.json.model` differs from active `modelName`.
-- `vdl-hybrid-index` CLI (`bin`) for config-driven index + vector generation.
+- `vwl-hybrid-index` CLI (`bin`) for config-driven index + vector generation.
 
 ### Changed
 
@@ -39,7 +39,7 @@ vectors are rebuilt, or regenerate with `vdl-hybrid-index --preset embeddinggemm
 
 ## 0.1.1 — public release candidate
 
-First public npm release of `@vanduo-oss/vdl-hybrid-search`.
+First public npm release of `@vanduo-oss/vwl-hybrid-search`.
 
 - Optional `onnxWasmPaths` for CSP hosts (same-origin ORT WASM).
 - Publishable package metadata (`private` removed); `prepublishOnly` runs build + `test:ci`.

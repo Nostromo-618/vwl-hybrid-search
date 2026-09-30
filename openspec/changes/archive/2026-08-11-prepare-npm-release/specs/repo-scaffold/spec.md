@@ -2,12 +2,12 @@
 
 ### Requirement: package-metadata
 
-The package MUST declare `@vanduo-oss/vdl-hybrid-search` with exports for `.` and `./guardrails/search`, MIT license, pnpm 10, node `>=20.19.0`. It MUST be publishable (MUST NOT set `"private": true`) with `publishConfig.access` of `public`.
+The package MUST declare `@vanduo-oss/vwl-hybrid-search` with exports for `.` and `./guardrails/search`, MIT license, pnpm 10, node `>=20.19.0`. It MUST be publishable (MUST NOT set `"private": true`) with `publishConfig.access` of `public`.
 
 #### Scenario: version sync
 - **GIVEN** package version `0.1.1`
 - **WHEN** smoke tests run
-- **THEN** `VDL_HYBRID_SEARCH_VERSION` equals `0.1.1`
+- **THEN** `VWL_HYBRID_SEARCH_VERSION` equals `0.1.1`
 
 #### Scenario: package is not private
 - **WHEN** `package.json` is inspected for a release candidate

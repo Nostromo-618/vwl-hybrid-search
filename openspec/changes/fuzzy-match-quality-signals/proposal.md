@@ -19,7 +19,7 @@ the wrong lesson. Consumers need optional quality signals without changing defau
 
 ### Modified Capabilities
 
-- `vdl-hybrid-search`: fuzzy match quality signals
+- `vwl-hybrid-search`: fuzzy match quality signals
 
 ## Impact
 
