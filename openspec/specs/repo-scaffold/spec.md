@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Package scaffold, Labs-sibling metadata, and GitHub Actions CI for
+Package scaffold and Labs-sibling metadata for
 `@vanduo-oss/vwl-hybrid-search` (not a public npm package).
 
 ## Requirements
@@ -25,14 +25,19 @@ exports and typed entry points. It MUST be a Labs sibling repo
 - **WHEN** smoke tests run
 - **THEN** `VWL_HYBRID_SEARCH_VERSION` equals `0.2.0`
 
-### Requirement: github-actions-ci
+### Requirement: no remote CI
 
-The repository MUST include a GitHub Actions workflow on push/PR to `main` that
-runs format check, lint, typecheck, `test:ci`, build, and dependency audit. It
-MUST NOT run npm publish or treat the package as a registry release.
+The repository MUST NOT include GitHub Actions workflows or Dependabot config.
+Format check, lint, typecheck, `test:ci`, build, and dependency audit stay
+local scripts. It MUST NOT run npm publish or treat the package as a registry
+release.
 
-#### Scenario: CI does not require local inference gate
+#### Scenario: Actions are absent
 
-- **WHEN** the CI workflow executes
-- **THEN** it MUST NOT require the local MiniLM/Fuse inference suite to pass as
-  part of remote CI
+- **WHEN** `.github` is inspected
+- **THEN** it contains no workflow files and no `dependabot.yml`
+
+#### Scenario: the default test script does not require local inference
+
+- **WHEN** `pnpm test:ci` executes
+- **THEN** it MUST NOT require the local MiniLM/Fuse inference suite to pass

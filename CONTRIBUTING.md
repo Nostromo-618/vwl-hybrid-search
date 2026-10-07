@@ -28,7 +28,7 @@ Use the repo’s OpenSpec skills/CLI when proposing or applying larger changes.
   MiniLM against fixtures. Model downloads cache under
   `tests/e2e/.model-cache/` (gitignored).
 
-Do not add mandatory GPU/MiniLM inference to GitHub Actions CI.
+Do not add GitHub Actions. Keep MiniLM inference out of `pnpm test:ci`.
 
 ## Pull requests
 

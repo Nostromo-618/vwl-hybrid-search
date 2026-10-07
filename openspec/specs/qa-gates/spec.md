@@ -2,8 +2,8 @@
 
 ## Purpose
 
-Defines dual QA gates and release documentation for publishing
-`@vanduo-oss/vwl-hybrid-search` while keeping remote CI free of mandatory heavy
+Defines dual QA gates and release documentation for
+`@vanduo-oss/vwl-hybrid-search`. `pnpm test:ci` stays free of mandatory heavy
 semantic model downloads.
 
 ## Requirements
@@ -17,7 +17,7 @@ developer hardware (baseline: Apple Silicon M4 with ≥24GB unified memory).
 
 #### Scenario: CI suite excludes mandatory inference download
 
-- **WHEN** `pnpm test:ci` runs in GitHub Actions
+- **WHEN** `pnpm test:ci` runs
 - **THEN** tests MUST pass without requiring a GPU or a warm MiniLM cache
 - **AND** coverage thresholds of at least 90% lines, branches, and functions on
   `src/` MUST be enforced for the CI suite
