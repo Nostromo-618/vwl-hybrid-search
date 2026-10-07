@@ -4,16 +4,16 @@
   "private": true,
   "description": "Vanduo Web Labs headless hybrid fuzzy+semantic search (VwlHybridSearch)",
   "type": "module",
-  "homepage": "https://github.com/vanduo-oss/vwl-hybrid-search#readme",
+  "homepage": "https://github.com/nostromo-618/vwl-hybrid-search#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vanduo-oss/vwl-hybrid-search.git"
+    "url": "git+https://github.com/nostromo-618/vwl-hybrid-search.git"
   },
   "bugs": {
-    "url": "https://github.com/vanduo-oss/vwl-hybrid-search/issues"
+    "url": "https://github.com/nostromo-618/vwl-hybrid-search/issues"
   },
   "license": "MIT",
-  "author": "vanduo-oss",
+  "author": "nostromo-618",
   "keywords": [
     "vanduo",
     "search",
